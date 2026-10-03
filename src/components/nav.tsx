@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/radna-mesta", label: "Radna mesta" },
   { href: "/lekarski-pregledi", label: "Lekarski pregledi" },
   { href: "/obuke", label: "Obuke" },
+  { href: "/lzo", label: "LZO" },
 ];
 
 export function Nav() {

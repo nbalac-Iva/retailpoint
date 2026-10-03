@@ -10,7 +10,7 @@ export default async function PositionsPage() {
 
   const { data: positions } = await supabase
     .from("job_position")
-    .select("id, name, code, is_high_risk, employee(count), position_exam_req(count), position_training_req(count)")
+    .select("id, name, code, is_high_risk, employee(count), position_exam_req(count), position_training_req(count), ppe_norm(count)")
     .eq("company_id", companyId)
     .order("name");
 
@@ -22,7 +22,7 @@ export default async function PositionsPage() {
         {!positions?.length ? (
           <Empty>Još nema radnih mesta.</Empty>
         ) : (
-          <Table head={["Naziv", "Šifra", "Povećan rizik", "Zaposleni", "Pregledi", "Obuke"]}>
+          <Table head={["Naziv", "Šifra", "Povećan rizik", "Zaposleni", "Pregledi", "Obuke", "LZO"]}>
             {positions.map((p) => (
               <tr key={p.id}>
                 <td className="px-2 py-2">
@@ -35,6 +35,7 @@ export default async function PositionsPage() {
                 <td className="px-2 py-2">{p.employee[0]?.count ?? 0}</td>
                 <td className="px-2 py-2">{p.position_exam_req[0]?.count ?? 0}</td>
                 <td className="px-2 py-2">{p.position_training_req[0]?.count ?? 0}</td>
+                <td className="px-2 py-2">{p.ppe_norm[0]?.count ?? 0}</td>
               </tr>
             ))}
           </Table>

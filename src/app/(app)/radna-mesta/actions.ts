@@ -91,6 +91,33 @@ export async function addTrainingReq(positionId: string, _prev: ActionState, for
   return { ok: Date.now() };
 }
 
+export async function addPpeNorm(positionId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  const { supabase, companyId, canEdit } = await getContext();
+  if (!canEdit) return NO_EDIT;
+  const itemId = String(formData.get("ppe_item_id") ?? "");
+  if (!itemId) return { error: "Izaberite opremu." };
+
+  const { error } = await supabase.from("ppe_norm").insert({
+    company_id: companyId,
+    job_position_id: positionId,
+    ppe_item_id: itemId,
+    quantity: optionalInt(formData.get("quantity")) ?? 1,
+    replacement_months: optionalInt(formData.get("replacement_months")),
+  });
+  if (error) {
+    return { error: error.code === "23505" ? "Ova oprema je već u normativu." : error.message };
+  }
+  revalidatePath("/", "layout");
+  return { ok: Date.now() };
+}
+
+export async function removePpeNorm(id: string) {
+  const { supabase, canEdit } = await getContext();
+  if (!canEdit) return;
+  await supabase.from("ppe_norm").delete().eq("id", id);
+  revalidatePath("/", "layout");
+}
+
 export async function removeExamReq(id: string) {
   const { supabase, canEdit } = await getContext();
   if (!canEdit) return;

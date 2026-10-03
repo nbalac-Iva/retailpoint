@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { Card, Empty, PageHeader, StatusBadge, Table } from "@/components/ui";
 import { getContext } from "@/lib/context";
-import { formatDate, fullName, STATUS_CLASS, STATUS_LABEL, type ComplianceStatus } from "@/lib/format";
+import {
+  formatDate,
+  fullName,
+  REQUIREMENT_TYPE_LABEL,
+  STATUS_CLASS,
+  STATUS_LABEL,
+  type ComplianceStatus,
+} from "@/lib/format";
 
 type Row = {
   employee_id: string;
   first_name: string;
   last_name: string;
-  requirement_type: "exam" | "training";
+  requirement_type: "exam" | "training" | "ppe";
   requirement_name: string;
   valid_until: string | null;
   status: ComplianceStatus;
@@ -57,7 +64,7 @@ export default async function DashboardPage() {
         {all.length === 0 ? (
           <Empty>
             Još nema obaveza. Dodajte <Link href="/radna-mesta" className="text-blue-700 hover:underline">radna mesta</Link>{" "}
-            sa obaveznim pregledima i obukama, pa im rasporedite{" "}
+            sa obaveznim pregledima, obukama i LZO, pa im rasporedite{" "}
             <Link href="/zaposleni" className="text-blue-700 hover:underline">zaposlene</Link>.
           </Empty>
         ) : problems.length === 0 ? (
@@ -72,7 +79,7 @@ export default async function DashboardPage() {
                   </Link>
                 </td>
                 <td className="px-2 py-2">{r.requirement_name}</td>
-                <td className="px-2 py-2 text-gray-600">{r.requirement_type === "exam" ? "Lekarski pregled" : "Obuka"}</td>
+                <td className="px-2 py-2 text-gray-600">{REQUIREMENT_TYPE_LABEL[r.requirement_type]}</td>
                 <td className="px-2 py-2">{formatDate(r.valid_until)}</td>
                 <td className="px-2 py-2">
                   <StatusBadge status={r.status} />

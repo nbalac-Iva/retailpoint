@@ -119,6 +119,47 @@ export function ExamFields({
   );
 }
 
+export function PpeIssueFields({
+  items,
+  employees,
+  employeeId,
+}: {
+  items: Option[];
+  employees?: EmployeeOption[];
+  employeeId?: string;
+}) {
+  return (
+    <>
+      <EmployeePicker employees={employees} employeeId={employeeId} />
+      <Field label="Oprema">
+        <select name="ppe_item_id" required className={inputClass}>
+          <option value="">Izaberite…</option>
+          {items.map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Datum zaduženja">
+        <input name="issued_on" type="date" required className={inputClass} />
+      </Field>
+      <Field label="Veličina">
+        <input name="size" placeholder="npr. 42, L" className={inputClass} />
+      </Field>
+      <Field label="Količina">
+        <input name="quantity" type="number" min={1} defaultValue={1} className={inputClass} />
+      </Field>
+      <Field label="Zameniti do (prazno = po normativu)">
+        <input name="replace_by" type="date" className={inputClass} />
+      </Field>
+      <Field label="Napomena" wide>
+        <input name="note" className={inputClass} />
+      </Field>
+    </>
+  );
+}
+
 export function TrainingFields({
   programs,
   employees,

@@ -14,6 +14,12 @@ export const STATUS_CLASS: Record<ComplianceStatus, string> = {
   missing: "bg-gray-200 text-gray-800",
 };
 
+export const REQUIREMENT_TYPE_LABEL: Record<string, string> = {
+  exam: "Lekarski pregled",
+  training: "Obuka",
+  ppe: "LZO",
+};
+
 export const EMPLOYEE_STATUS_LABEL: Record<string, string> = {
   active: "Aktivan",
   leave: "Odsutan",

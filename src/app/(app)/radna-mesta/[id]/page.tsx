@@ -7,9 +7,11 @@ import { getContext } from "@/lib/context";
 import { fullName, one } from "@/lib/format";
 import {
   addExamReq,
+  addPpeNorm,
   addTrainingReq,
   deletePosition,
   removeExamReq,
+  removePpeNorm,
   removeTrainingReq,
   updatePosition,
 } from "../actions";
@@ -19,19 +21,21 @@ export default async function PositionPage(props: PageProps<"/radna-mesta/[id]">
   const { id } = await props.params;
   const { supabase, companyId, canEdit } = await getContext();
 
-  const [{ data: position }, { data: examTypes }, { data: programs }] = await Promise.all([
+  const [{ data: position }, { data: examTypes }, { data: programs }, { data: ppeItems }] = await Promise.all([
     supabase
       .from("job_position")
       .select(
         `id, name, code, is_high_risk, description,
          position_exam_req (id, interval_months, exam_type (name)),
          position_training_req (id, training_program (name, validity_months)),
+         ppe_norm (id, quantity, replacement_months, ppe_item (name, replacement_months)),
          employee (id, first_name, last_name, status)`,
       )
       .eq("id", id)
       .maybeSingle(),
     supabase.from("exam_type").select("id, name").order("name"),
     supabase.from("training_program").select("id, name").eq("company_id", companyId).order("name"),
+    supabase.from("ppe_item").select("id, name").eq("company_id", companyId).order("name"),
   ]);
 
   if (!position) notFound();
@@ -129,6 +133,62 @@ export default async function PositionPage(props: PageProps<"/radna-mesta/[id]">
               Prvo dodajte obuku na stranici{" "}
               <Link href="/obuke" className="text-blue-700 hover:underline">
                 Obuke
+              </Link>
+              .
+            </p>
+          ))}
+      </Card>
+
+      <Card title="Normativ LZO">
+        {!position.ppe_norm.length ? (
+          <Empty>Nema obavezne opreme.</Empty>
+        ) : (
+          <Table head={["Oprema", "Količina", "Zamena", ""]}>
+            {position.ppe_norm.map((n) => {
+              const item = one(n.ppe_item);
+              const months = n.replacement_months ?? item?.replacement_months;
+              return (
+                <tr key={n.id}>
+                  <td className="px-2 py-2">{item?.name}</td>
+                  <td className="px-2 py-2">{n.quantity}</td>
+                  <td className="px-2 py-2">{months ? `na ${months} meseci` : "bez roka"}</td>
+                  <td className="px-2 py-2 text-right">
+                    {canEdit && (
+                      <form action={removePpeNorm.bind(null, n.id)}>
+                        <button className={removeButton}>Ukloni</button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </Table>
+        )}
+        {canEdit &&
+          (ppeItems?.length ? (
+            <ActionForm action={addPpeNorm.bind(null, position.id)} submitLabel="Dodaj u normativ" className={`${formGrid} mt-4`}>
+              <Field label="Oprema">
+                <select name="ppe_item_id" required className={inputClass}>
+                  <option value="">Izaberite…</option>
+                  {ppeItems.map((i) => (
+                    <option key={i.id} value={i.id}>
+                      {i.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Količina">
+                <input name="quantity" type="number" min={1} defaultValue={1} className={inputClass} />
+              </Field>
+              <Field label="Zamena na (meseci, prazno = rok sa opreme)">
+                <input name="replacement_months" type="number" min={1} className={inputClass} />
+              </Field>
+            </ActionForm>
+          ) : (
+            <p className="mt-4 text-sm text-gray-600">
+              Prvo dodajte opremu na stranici{" "}
+              <Link href="/lzo" className="text-blue-700 hover:underline">
+                LZO
               </Link>
               .
             </p>

@@ -2,11 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmButton } from "@/components/confirm-button";
-import { EmployeeFields, ExamFields, TrainingFields } from "@/components/forms";
+import { EmployeeFields, ExamFields, PpeIssueFields, TrainingFields } from "@/components/forms";
 import { Card, Empty, formGrid, PageHeader, StatusBadge, Table } from "@/components/ui";
 import { getContext } from "@/lib/context";
-import { EXAM_RESULT_LABEL, formatDate, fullName, one, TRAINING_REASON_LABEL, type ComplianceStatus } from "@/lib/format";
+import {
+  EXAM_RESULT_LABEL,
+  formatDate,
+  fullName,
+  one,
+  REQUIREMENT_TYPE_LABEL,
+  TRAINING_REASON_LABEL,
+  type ComplianceStatus,
+} from "@/lib/format";
 import { addExam, deleteExam } from "../../lekarski-pregledi/actions";
+import { issuePpe } from "../../lzo/actions";
+import { IssueTable } from "../../lzo/issue-table";
 import { addTrainingRecord, deleteTrainingRecord } from "../../obuke/actions";
 import { deleteEmployee, updateEmployee } from "../actions";
 
@@ -16,7 +26,17 @@ export default async function EmployeePage(props: PageProps<"/zaposleni/[id]">) 
   const { id } = await props.params;
   const { supabase, companyId, canEdit } = await getContext();
 
-  const [{ data: employee }, { data: compliance }, { data: exams }, { data: trainings }, { data: positions }, { data: examTypes }, { data: programs }] =
+  const [
+    { data: employee },
+    { data: compliance },
+    { data: exams },
+    { data: trainings },
+    { data: positions },
+    { data: examTypes },
+    { data: programs },
+    { data: ppeIssues },
+    { data: ppeItems },
+  ] =
     await Promise.all([
       supabase
         .from("employee")
@@ -37,6 +57,12 @@ export default async function EmployeePage(props: PageProps<"/zaposleni/[id]">) 
       supabase.from("job_position").select("id, name").eq("company_id", companyId).order("name"),
       supabase.from("exam_type").select("id, name").order("name"),
       supabase.from("training_program").select("id, name").eq("company_id", companyId).order("name"),
+      supabase
+        .from("ppe_issue")
+        .select("id, size, quantity, issued_on, replace_by, returned_on, ppe_item (name)")
+        .eq("employee_id", id)
+        .order("issued_on", { ascending: false }),
+      supabase.from("ppe_item").select("id, name").eq("company_id", companyId).order("name"),
     ]);
 
   if (!employee) notFound();
@@ -66,7 +92,7 @@ export default async function EmployeePage(props: PageProps<"/zaposleni/[id]">) 
             {compliance.map((r: { requirement_id: string; requirement_type: string; requirement_name: string; valid_until: string | null; status: ComplianceStatus }) => (
               <tr key={`${r.requirement_type}-${r.requirement_id}`}>
                 <td className="px-2 py-2">{r.requirement_name}</td>
-                <td className="px-2 py-2 text-gray-600">{r.requirement_type === "exam" ? "Lekarski pregled" : "Obuka"}</td>
+                <td className="px-2 py-2 text-gray-600">{REQUIREMENT_TYPE_LABEL[r.requirement_type]}</td>
                 <td className="px-2 py-2">{formatDate(r.valid_until)}</td>
                 <td className="px-2 py-2">
                   <StatusBadge status={r.status} />
@@ -110,6 +136,31 @@ export default async function EmployeePage(props: PageProps<"/zaposleni/[id]">) 
           </ActionForm>
         </Card>
       )}
+
+      <Card title="Lična zaštitna oprema">
+        {!ppeIssues?.length ? (
+          <Empty>Nema zaduženja.</Empty>
+        ) : (
+          <IssueTable issues={ppeIssues} canEdit={canEdit} showEmployee={false} />
+        )}
+        {canEdit &&
+          (ppeItems?.length ? (
+            <>
+              <h3 className="mb-3 mt-6 text-sm font-semibold text-gray-900">Zaduži opremu</h3>
+              <ActionForm action={issuePpe} submitLabel="Zaduži" className={formGrid}>
+                <PpeIssueFields items={ppeItems} employeeId={employee.id} />
+              </ActionForm>
+            </>
+          ) : (
+            <p className="mt-4 text-sm text-gray-600">
+              Prvo dodajte opremu na stranici{" "}
+              <Link href="/lzo" className="text-blue-700 hover:underline">
+                LZO
+              </Link>
+              .
+            </p>
+          ))}
+      </Card>
 
       <Card title="Obuke">
         {!trainings?.length ? (
