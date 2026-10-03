@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmButton } from "@/components/confirm-button";
-import { PpeIssueFields } from "@/components/forms";
 import { Card, Empty, Field, formGrid, inputClass, PageHeader, Table } from "@/components/ui";
 import { getContext } from "@/lib/context";
-import { createItem, deleteItem, issuePpe } from "./actions";
+import { createItem, deleteItem } from "./actions";
 import { IssueTable } from "./issue-table";
+import { NewIssue } from "./new-issue";
 
 export default async function PpePage(props: PageProps<"/lzo">) {
   const { sve } = await props.searchParams;
@@ -35,36 +35,38 @@ export default async function PpePage(props: PageProps<"/lzo">) {
       .order("last_name"),
   ]);
 
+  const toolbar = showAll ? (
+    <Link href="/lzo" className="text-blue-700 hover:underline">
+      Prikaži samo trenutna
+    </Link>
+  ) : (
+    <Link href="/lzo?sve=1" className="text-blue-700 hover:underline">
+      Prikaži i razdužena
+    </Link>
+  );
+
   return (
     <>
       <PageHeader title="Lična zaštitna oprema" />
 
-      {canEdit && !!items?.length && (
-        <Card title="Zaduži opremu">
-          {employees?.length ? (
-            <ActionForm action={issuePpe} submitLabel="Zaduži" className={formGrid}>
-              <PpeIssueFields items={items} employees={employees} />
-            </ActionForm>
-          ) : (
-            <Empty>
-              Prvo dodajte <Link href="/zaposleni" className="text-blue-700 hover:underline">zaposlene</Link>.
-            </Empty>
-          )}
-        </Card>
-      )}
-
       <Card title={showAll ? "Sva zaduženja" : "Trenutna zaduženja"}>
-        <p className="mb-3 text-sm">
-          {showAll ? (
-            <Link href="/lzo" className="text-blue-700 hover:underline">
-              Prikaži samo trenutna
-            </Link>
-          ) : (
-            <Link href="/lzo?sve=1" className="text-blue-700 hover:underline">
-              Prikaži i razdužena
-            </Link>
-          )}
-        </p>
+        {canEdit && items?.length && employees?.length ? (
+          <NewIssue items={items} employees={employees} toolbar={toolbar} />
+        ) : (
+          <div className="mb-3 space-y-1 text-sm">
+            <p>{toolbar}</p>
+            {canEdit && !items?.length && <p className="text-gray-600">Za novo zaduženje prvo dodajte opremu (dole).</p>}
+            {canEdit && !!items?.length && !employees?.length && (
+              <p className="text-gray-600">
+                Za novo zaduženje prvo dodajte{" "}
+                <Link href="/zaposleni" className="text-blue-700 hover:underline">
+                  zaposlene
+                </Link>
+                .
+              </p>
+            )}
+          </div>
+        )}
         {!issues?.length ? <Empty>Nema zaduženja.</Empty> : <IssueTable issues={issues} canEdit={canEdit} showEmployee />}
       </Card>
 

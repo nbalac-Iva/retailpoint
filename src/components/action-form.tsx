@@ -12,18 +12,29 @@ export function ActionForm({
   children,
   className = "",
   resetOnSuccess = true,
+  onSuccess,
+  extraButtons,
 }: {
   action: Action;
   submitLabel: string;
   children: React.ReactNode;
   className?: string;
   resetOnSuccess?: boolean;
+  onSuccess?: () => void;
+  extraButtons?: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const formRef = useRef<HTMLFormElement>(null);
+  const onSuccessRef = useRef(onSuccess);
 
   useEffect(() => {
-    if (state.ok && resetOnSuccess) formRef.current?.reset();
+    onSuccessRef.current = onSuccess;
+  });
+
+  useEffect(() => {
+    if (!state.ok) return;
+    if (resetOnSuccess) formRef.current?.reset();
+    onSuccessRef.current?.();
   }, [state.ok, resetOnSuccess]);
 
   return (
@@ -46,6 +57,7 @@ export function ActionForm({
         >
           {pending ? "Čuvam…" : submitLabel}
         </button>
+        {extraButtons}
         {state.error && <p className="text-sm text-red-700">{state.error}</p>}
       </div>
     </form>
