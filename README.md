@@ -10,7 +10,7 @@ Web aplikacija za evidencije bezbednosti i zdravlja na radu: radna mesta sa obav
 
 1. **Supabase projekat.** Na [supabase.com](https://supabase.com) napravite projekat (region: Frankfurt, `eu-central-1`).
 2. **Šema baze.** U Supabase otvorite **SQL Editor**, nalepite ceo sadržaj fajla [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) i kliknite **Run**.
-3. **Ključevi.** U Supabase -> **Project Settings -> API Keys** kopirajte *Project URL* i *Publishable key* u fajl `.env.local` (primer je u `.env.example`).
+3. **Ključevi.** *Project URL* i *Publishable key* (Supabase -> **Project Settings -> API Keys**) upisani su u [`src/lib/supabase/config.ts`](src/lib/supabase/config.ts). Oba su javna; tajni ključ (`sb_secret_…`) nikad ne ide u kod.
 4. **Adrese za prijavu.** U Supabase -> **Authentication -> URL Configuration** dodajte u *Redirect URLs*:
    - `http://localhost:3000/**`
    - adresu sa Vercel-a, `https://retailpoint.vercel.app/**`
@@ -26,9 +26,8 @@ Web aplikacija za evidencije bezbednosti i zdravlja na radu: radna mesta sa obav
 ## Objava na Vercel
 
 1. Pošaljite kod na GitHub (`git push`).
-2. Na [vercel.com/new](https://vercel.com/new) uvezite repozitorijum.
-3. U *Environment Variables* dodajte iste dve promenljive kao u `.env.local`.
-4. Posle toga svaki `git push` sam objavljuje novu verziju.
+2. Na [vercel.com/new](https://vercel.com/new) uvezite repozitorijum. Promenljive okruženja nisu potrebne.
+3. Posle toga svaki `git push` sam objavljuje novu verziju.
 
 ## Struktura
 
