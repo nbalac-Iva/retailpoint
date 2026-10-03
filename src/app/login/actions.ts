@@ -15,7 +15,10 @@ function credentials(formData: FormData) {
 export async function login(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(credentials(formData));
-  if (error) return { error: "Pogrešan email ili lozinka, ili email još nije potvrđen." };
+  if (error?.code === "email_not_confirmed") {
+    return { error: "Email još nije potvrđen. Kliknite na link iz emaila koji smo vam poslali." };
+  }
+  if (error) return { error: "Pogrešan email ili lozinka. Ako još nemate nalog, kliknite „Registrujte se“ ispod." };
   redirect("/");
 }
 

@@ -59,7 +59,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
           ) : (
             <>
               Nemate nalog?{" "}
-              <Link href="/login?registracija=1" className="text-blue-700 hover:underline">
+              <Link href="/login?registracija=1" className="font-medium text-blue-700 underline">
                 Registrujte se
               </Link>
             </>
