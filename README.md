@@ -1,4 +1,4 @@
-# Zentra BZR
+# RetailPoint BZR
 
 Web aplikacija za evidencije bezbednosti i zdravlja na radu: radna mesta sa obaveznim pregledima i obukama, zaposleni, lekarski pregledi, obuke i pregled usklađenosti.
 
@@ -13,7 +13,7 @@ Web aplikacija za evidencije bezbednosti i zdravlja na radu: radna mesta sa obav
 3. **Ključevi.** U Supabase -> **Project Settings -> API Keys** kopirajte *Project URL* i *Publishable key* u fajl `.env.local` (primer je u `.env.example`).
 4. **Adrese za prijavu.** U Supabase -> **Authentication -> URL Configuration** dodajte u *Redirect URLs*:
    - `http://localhost:3000/**`
-   - adresu sa Vercel-a, npr. `https://zentra-app.vercel.app/**`
+   - adresu sa Vercel-a, `https://zentra-app-pi.vercel.app/**`
 5. **Pokretanje na računaru:**
 
    ```bash

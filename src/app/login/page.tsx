@@ -10,7 +10,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6">
-        <h1 className="mb-1 text-xl font-semibold text-gray-900">Zentra BZR</h1>
+        <h1 className="mb-1 text-xl font-semibold text-gray-900">RetailPoint BZR</h1>
         <p className="mb-6 text-sm text-gray-600">
           {isSignup ? "Napravite nalog za svoju firmu." : "Prijavite se na svoj nalog."}
         </p>

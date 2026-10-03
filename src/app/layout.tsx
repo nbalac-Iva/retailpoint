@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zentra BZR",
+  title: "RetailPoint BZR",
   description: "Evidencije bezbednosti i zdravlja na radu",
 };
 
