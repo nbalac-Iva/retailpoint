@@ -30,7 +30,16 @@ export default async function EmployeesPage() {
 
   return (
     <>
-      <PageHeader title="Zaposleni" />
+      <PageHeader title="Zaposleni">
+        {canEdit && (
+          <Link
+            href="/zaposleni/uvoz"
+            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 hover:bg-gray-50"
+          >
+            Uvezi iz Excela
+          </Link>
+        )}
+      </PageHeader>
 
       <Card>
         {!employees?.length ? (

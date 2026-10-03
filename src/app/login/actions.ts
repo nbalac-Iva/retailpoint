@@ -40,6 +40,21 @@ export async function signup(_prev: ActionState, formData: FormData): Promise<Ac
   redirect("/pocetak");
 }
 
+export async function requestPasswordReset(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: "Unesite email." };
+
+  const origin = (await headers()).get("origin") ?? "";
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/nova-lozinka`,
+  });
+  if (error?.status === 429) return { error: "Previše zahteva. Pokušajte ponovo za par minuta." };
+  if (error) return { error: "Slanje nije uspelo. Pokušajte ponovo za par minuta." };
+  // Ista poruka i kad nalog ne postoji, da se ne otkriva ko ima nalog.
+  redirect("/login?reset=poslato");
+}
+
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
